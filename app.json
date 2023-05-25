@@ -1,0 +1,39 @@
+{
+    "name": "Pdisk Uploader Bot",
+    "description": "Download pdisk videos and upload into the telegram as file. ",
+    "repository": "https://github.com/iseshu/ubiquitous-telegram",
+    "keywords": ["python", "heroku"],
+    "env": {
+      "API_ID": {
+        "description": "API ID from Telegram",
+        "required": true
+      },
+      "API_HASH": {
+        "description": "API hash from Telegram",
+        "required": true
+      },
+      "BOT_TOKEN": {
+        "description": "Bot token from Telegram",
+        "required": true
+      },
+      "DUMP_ID": {
+        "description": "Dump ID for storing files",
+        "required": true
+      },
+      "DATABASE_URL": {
+        "description": "URL of the mongodb database",
+        "required": true
+      }
+    },
+    "buildpacks": [
+      {
+        "url": "heroku/python"
+      }
+    ],
+    "scripts": {
+      "setup": "pip install -r requirements.txt",
+      "start": "python3 bot.py"
+    },
+    "logo": "thumb.jpg"
+  }
+  

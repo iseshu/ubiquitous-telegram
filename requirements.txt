@@ -1,0 +1,6 @@
+pyrogram
+Tgcrypto
+bs4
+requests
+pymongo
+dnspython
