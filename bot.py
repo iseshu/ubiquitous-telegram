@@ -74,23 +74,34 @@ async def callback(client, query_callback):
             await bot.send_document(document=file_id,chat_id=chat_id,caption="Join @yssprojects")
             await query_callback.message.delete()
         else:
-            await query_callback.message.edit_text("`📥 Downloading Please Wait...`")
-            file_name,total_size = await download(id,query_callback)
-            await query_callback.message.edit_text("`Uploading to telegram...`")
-            start_time = time.time()
-            document = await bot.send_document(chat_id=chat_id,
-                                    document=f"{id}.mp4",
-                                    file_name=f"{file_name.replace(' mp4','')}.mp4",
-                                    force_document=True,
-                                    progress=upload,
-                                    thumb = open("thumb.jpg","rb"),
-                                    caption="Join @yssprojects",
-                                    progress_args=(file_name,query_callback.message.id,chat_id,start_time,bot))
-            await query_callback.message.delete()
-            os.remove(f"{id}.mp4")
-            document_id = document.document.file_id
-            document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
-            mycol.insert_one({"_id":id,"file_id":document.document.file_id})
+            if os.path.exists(f"{id}.mp4"):
+                await query_callback.message.edit_text(f"✋`Stop someone is downloading the video please try again using try now button`\nUpdated at {time.localtime()}",
+                                                       reply_markup=InlineKeyboardMarkup(
+                                                            [
+                                                                [
+                                                                    InlineKeyboardButton(text="📥 Download Video",callback_data=f"download-{id}")
+                                                                ]
+                                                            ]
+                                                       )
+                                                       )
+            else:
+                await query_callback.message.edit_text("`📥 Downloading Please Wait...`")
+                file_name,total_size = await download(id,query_callback)
+                await query_callback.message.edit_text("`Uploading to telegram...`")
+                start_time = time.time()
+                document = await bot.send_document(chat_id=chat_id,
+                                        document=f"{id}.mp4",
+                                        file_name=f"{file_name.replace(' mp4','')}.mp4",
+                                        force_document=True,
+                                        progress=upload,
+                                        thumb = open("thumb.jpg","rb"),
+                                        caption="Join @yssprojects",
+                                        progress_args=(file_name,query_callback.message.id,chat_id,start_time,bot))
+                await query_callback.message.delete()
+                os.remove(f"{id}.mp4")
+                document_id = document.document.file_id
+                document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
+                mycol.insert_one({"_id":id,"file_id":document.document.file_id})
         
 
 if __name__ == "__main__":
