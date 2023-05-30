@@ -34,8 +34,6 @@ async def download(id, callback_query):
                 except:
                     pass
         f.close()
-
-    # Send a message to the user to let them know the download is complete
     await callback_query.message.edit_text("Download complete. Uploading to Telegram...")
     return data['title'],total_size
 
@@ -43,14 +41,13 @@ last_time = time.time()
 
 
 async def upload(current,total,title,id,chat_id,start_time,bot):
-        if time.time()-start_time > 3:
+        if round(time.time()-start_time) > 3 and current !=0:
             percentage = (current / total) * 100
             speed = current/ (time.time()-start_time)
             eta = (total - current) / speed if speed > 0 else 0
-            await bot.send_chat_action(chat_id, enums.ChatAction.UPLOAD_DOCUMENT)
             progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
             progress_message += f"💨Speed: `{await convert_size(speed)}/s`\n\n"
-            progress_message += f"ETA: `{eta:.2f} seconds\n`"
+            progress_message += f"ETA: ` {time.strftime('%H:%M:%S', time.gmtime(eta))}\n`"
             await bot.edit_message_text(
              chat_id= chat_id,
              message_id = id,
