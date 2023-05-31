@@ -39,9 +39,11 @@ async def download(id, callback_query):
 
 last_time = time.time()
 
-
-async def upload(current,total,title,id,chat_id,start_time,bot):
-        if round(time.time()-start_time) > 3 and current !=0:
+elapse_time = {}
+async def upload(current,total,title,id,chat_id,start_time,file_id,bot):
+        global elapse_time
+        elapse_time[file_id] = time.time()
+        if round(time.time()-elapse_time[file_id]) > 3 and current !=0:
             percentage = (current / total) * 100
             speed = current/ (time.time()-start_time)
             eta = (total - current) / speed if speed > 0 else 0
