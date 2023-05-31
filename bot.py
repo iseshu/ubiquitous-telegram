@@ -21,9 +21,7 @@ bot = Client('pdisk bot',
              workers=50,
              sleep_threshold=10)
 
-myclient = pymongo.MongoClient(DATABASE_URL)
-mydb = myclient["iseshu"]
-mycol = mydb["files"]
+
 
 @bot.on_message(filters.command('start') & filters.private)
 async def start(bot, message):
@@ -96,7 +94,7 @@ async def callback(client, query_callback):
                                         progress=upload,
                                         thumb = open("thumb.jpg","rb"),
                                         caption="Join @yssprojects",
-                                        progress_args=(file_name,query_callback.message.id,chat_id,start_time,bot))
+                                        progress_args=(file_name,query_callback.message.id,chat_id,start_time,id,bot))
                 await query_callback.message.delete()
                 os.remove(f"{id}.mp4")
                 document_id = document.document.file_id
@@ -105,4 +103,7 @@ async def callback(client, query_callback):
         
 
 if __name__ == "__main__":
-    bot.run()
+  myclient = pymongo.MongoClient(DATABASE_URL)
+  mydb = myclient["iseshu"]
+  mycol = mydb["files"]
+  bot.run()
