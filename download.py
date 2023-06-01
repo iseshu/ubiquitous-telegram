@@ -42,18 +42,26 @@ last_time = time.time()
 elapse_time = {}
 async def upload(current,total,title,id,chat_id,start_time,file_id,bot):
         global elapse_time
-        elapse_time[file_id] = time.time()
-        if round(time.time()-elapse_time[file_id]) > 3 and current !=0:
-            percentage = (current / total) * 100
-            speed = current/ (time.time()-start_time)
-            eta = (total - current) / speed if speed > 0 else 0
-            progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
-            progress_message += f"💨Speed: `{await convert_size(speed)}/s`\n\n"
-            progress_message += f"ETA: ` {time.strftime('%H:%M:%S', time.gmtime(eta))}\n`"
-            await bot.edit_message_text(
-             chat_id= chat_id,
-             message_id = id,
-             text=progress_message
-            )
+        if current == total:
+            try:
+                elapse_time.pop(file_id)
+            except:
+                pass
+        if elapse_time[file_id]:
+            if round(time.time()-elapse_time[file_id]) > 3 and current !=0:
+                percentage = (current / total) * 100
+                speed = current/ (time.time()-start_time)
+                eta = (total - current) / speed if speed > 0 else 0
+                progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
+                progress_message += f"💨Speed: `{await convert_size(speed)}/s`\n\n"
+                progress_message += f"ETA: ` {time.strftime('%H:%M:%S', time.gmtime(eta))}\n`"
+                await bot.edit_message_text(
+                chat_id= chat_id,
+                message_id = id,
+                text=progress_message
+                )
+                elapse_time[file_id] = time.time()
+            else:
+                pass
         else:
-            pass
+            elapse_time[file_id] = time.time()
