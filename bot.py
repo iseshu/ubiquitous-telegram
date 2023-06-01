@@ -98,11 +98,12 @@ async def callback(client, query_callback):
                 await query_callback.message.delete()
                 os.remove(f"{id}.mp4")
                 document_id = document.document.file_id
-                document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
                 mycol.insert_one({"_id":id,"file_id":document.document.file_id})
-                print("file uplloaded to cloud")
-        
-
+                time.sleep(3)
+                try:
+                  document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
+                except:
+                  pass
 if __name__ == "__main__":
   myclient = pymongo.MongoClient(DATABASE_URL)
   mydb = myclient["iseshu"]
