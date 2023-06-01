@@ -100,6 +100,7 @@ async def callback(client, query_callback):
                 document_id = document.document.file_id
                 document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
                 mycol.insert_one({"_id":id,"file_id":document.document.file_id})
+                print("file uplloaded to cloud")
         
 
 if __name__ == "__main__":
