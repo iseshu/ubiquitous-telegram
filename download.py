@@ -47,7 +47,7 @@ async def upload(current,total,title,id,chat_id,start_time,file_id,bot):
                 elapse_time.pop(file_id)
             except:
                 pass
-        if elapse_time[file_id]:
+        if file_id in elapse_time:
             if round(time.time()-elapse_time[file_id]) > 3 and current !=0:
                 percentage = (current / total) * 100
                 speed = current/ (time.time()-start_time)
