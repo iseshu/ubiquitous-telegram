@@ -35,7 +35,7 @@ async def download(id, callback_query):
                     pass
         f.close()
     await callback_query.message.edit_text("Download complete. Uploading to Telegram...")
-    return data['title'],total_size
+    return data['title'],total_size,await convert_size(total_size)
 
 last_time = time.time()
 
