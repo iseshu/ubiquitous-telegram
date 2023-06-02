@@ -9,6 +9,7 @@ import pymongo
 import time
 import os
 
+
 API_ID = environ.get('API_ID')
 API_HASH = environ.get('API_HASH')
 BOT_TOKEN = environ.get('BOT_TOKEN')
@@ -71,6 +72,17 @@ async def callback(client, query_callback):
             file_id = file['file_id']
             await bot.send_document(document=file_id,chat_id=chat_id,caption="Join @yssprojects")
             await query_callback.message.delete()
+            if file['file_name']:
+                pass
+            else:
+                details = await get_details(f"seshu/{id}")
+                file_name = await filenam(details['title'])
+                size = details['size']
+                osize = details['osize']
+                file['file_size'] = size
+                file['file_name'] = file_name
+                file['file_size_bytes'] = osize
+                file.save()
         else:
             if os.path.exists(f"{id}.mp4"):
                 current_time_utc = datetime.utcnow()
@@ -110,8 +122,13 @@ async def callback(client, query_callback):
                   pass
 
 @bot.on_inline_query()
-async def inline(bot, query):
-    print(query)
+async def inline(bot, query_inline):
+    text = str(query_inline.query)
+    results = mycol.find()
+    for i in results:
+        print(i)
+
+
 
 if __name__ == "__main__":
   myclient = pymongo.MongoClient(DATABASE_URL)
