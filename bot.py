@@ -72,7 +72,7 @@ async def callback(client, query_callback):
             file_id = file['file_id']
             await bot.send_document(document=file_id,chat_id=chat_id,caption="Join @yssprojects")
             await query_callback.message.delete()
-            if file['file_name']:
+            if file_name in file:
                 pass
             else:
                 details = await get_details(f"seshu/{id}")
