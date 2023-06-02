@@ -1,4 +1,5 @@
 from pyrogram import Client, filters,enums
+from datetime import datetime, timedelta
 from pyrogram.types import *
 from helper import get_details,convert_size
 from download import download,upload
@@ -7,7 +8,6 @@ from os import environ
 import pymongo
 import time
 import os
-
 
 API_ID = environ.get('API_ID')
 API_HASH = environ.get('API_HASH')
@@ -73,7 +73,11 @@ async def callback(client, query_callback):
             await query_callback.message.delete()
         else:
             if os.path.exists(f"{id}.mp4"):
-                await query_callback.message.edit_text(f"✋`Stop someone is downloading the video please try again using try now button`\nUpdated at {time.localtime()}",
+                current_time_utc = datetime.utcnow()
+                ist_offset = timedelta(hours=5, minutes=30)
+                current_time_ist = current_time_utc + ist_offset
+                time_with_seconds = current_time_ist.strftime("%Y-%m-%d %H:%M:%S")
+                await query_callback.message.edit_text(f"✋`Stop someone is downloading the video please try again using try now button`\nUpdated at {time_with_seconds}",
                                                        reply_markup=InlineKeyboardMarkup(
                                                             [
                                                                 [
@@ -84,7 +88,7 @@ async def callback(client, query_callback):
                                                        )
             else:
                 await query_callback.message.edit_text("`📥 Downloading Please Wait...`")
-                file_name,total_size = await download(id,query_callback)
+                file_name,total_size,size = await download(id,query_callback)
                 await query_callback.message.edit_text("`Uploading to telegram...`")
                 start_time = time.time()
                 document = await bot.send_document(chat_id=chat_id,
@@ -98,12 +102,17 @@ async def callback(client, query_callback):
                 await query_callback.message.delete()
                 os.remove(f"{id}.mp4")
                 document_id = document.document.file_id
-                mycol.insert_one({"_id":id,"file_id":document.document.file_id})
+                mycol.insert_one({"_id":id,"file_id":document.document.file_id,"file_name":file_name, "file_size_bytes":total_size,"file_size":size})
                 time.sleep(3)
                 try:
-                  document = await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
+                  await bot.send_document(document=document_id,chat_id=DUMP_ID,caption=f"Downloaded By [{chat_id}](tg://user?id={chat_id})")
                 except:
                   pass
+
+@bot.on_inline_query()
+async def inline(bot, query):
+    print(query)
+
 if __name__ == "__main__":
   myclient = pymongo.MongoClient(DATABASE_URL)
   mydb = myclient["iseshu"]
