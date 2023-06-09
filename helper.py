@@ -37,4 +37,12 @@ async def filenam(filename):
     for i in list:
         filename = filename.lower().replace(i,'')
     return filename
-    
+
+async def progress_text(current, total):
+    progress = current / total
+    progress_bar_length = 10
+    completed_length = int(progress * progress_bar_length)
+    remaining_length = progress_bar_length - completed_length
+
+    progress_bar_text = "[" + "●" * completed_length + "○" * remaining_length + "]"
+    return progress_bar_text
