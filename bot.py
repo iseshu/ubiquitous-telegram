@@ -15,6 +15,7 @@ API_HASH = environ.get('API_HASH')
 BOT_TOKEN = environ.get('BOT_TOKEN')
 DUMP_ID = environ.get('DUMP_ID')
 DATABASE_URL = environ.get('DATABASE_URL')
+
 bot = Client('pdisk bot',
              api_id=API_ID,
              api_hash=API_HASH,
@@ -28,7 +29,18 @@ bot = Client('pdisk bot',
 async def start(bot, message):
     await message.reply(
         f"**Hi {message.chat.first_name}!**\n\n"
-        "I'm Pdisk Downloader bot. Just send me link and get the video\n⚠️Note :`I can upload upto 2GB`\n`if files are greater than 2GB I'll provide direct download link`\nCreated by @yssprojects")
+        "I'm Pdisk Downloader bot. Just send me link and get the video\n⚠️Note :`I can upload upto 2GB`\n`if files are greater than 2GB I'll provide direct download link`\nCreated by @yssprojects",
+        reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(text="Join Channel ❤️",url="https://t.me/yssprojects")
+                    ],
+                    [
+                        InlineKeyboardButton("🔎 Search Files", switch_inline_query_current_chat="")
+                    ]
+                ]
+            )
+        )
 
 
 @bot.on_message(filters.regex(r'https?://pdisk\.pro/[^\s]+') & filters.private)
@@ -72,7 +84,7 @@ async def callback(client, query_callback):
             file_id = file['file_id']
             await bot.send_document(document=file_id,chat_id=chat_id,caption="Join @yssprojects")
             await query_callback.message.delete()
-            if file.get('file_name'):
+            if 'file_name' in file:
                 pass
             else:
                 details = await get_details(f"seshu/{id}")
@@ -82,8 +94,8 @@ async def callback(client, query_callback):
                 file['file_size'] = size
                 file['file_name'] = file_name
                 file['file_size_bytes'] = osize
-                file.save()
-        else:
+                mycol.update_one({'_id': id}, {'$set': file})
+
             if os.path.exists(f"{id}.mp4"):
                 current_time_utc = datetime.utcnow()
                 ist_offset = timedelta(hours=5, minutes=30)
@@ -123,12 +135,32 @@ async def callback(client, query_callback):
 
 @bot.on_inline_query()
 async def inline(bot, query_inline):
-    text = str(query_inline.query)
+    text = str(query_inline.query).lower()
     results = mycol.find()
-    for i in results:
-        print(i)
-
-
+    data = [i for i in results if 'file_name' in i]
+    matches = [item for item in data if text in item['file_name'].lower()]
+    results = []
+    if matches:
+        length = min(len(matches), 50)
+        for i in range(length):
+            results.append(
+                InlineQueryResultCachedDocument(
+                title=matches[i]['file_name'],
+                document_file_id = matches[i]['file_id'],
+                description = matches[i]['file_size'],
+                caption=f"`{matches[i]['file_name']}`\n\n{matches[i]['file_size']}\n@yssprojects"
+                )
+            )
+    else:
+        results.append(
+            InlineQueryResultDocument(
+            title="No Video Found",
+            document_url="https://i.ibb.co/28LJjt3/thumb.jpg",
+            description="Join @yssprojects",
+            thumb_url="https://i.ibb.co/28LJjt3/thumb.jpg"
+            )
+        )
+    await bot.answer_inline_query(query_inline.id,results)
 
 if __name__ == "__main__":
   myclient = pymongo.MongoClient(DATABASE_URL)
