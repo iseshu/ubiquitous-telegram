@@ -3,7 +3,7 @@ import requests
 import time
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram import Client, filters, enums
-from helper import get_details, convert_size,filenam
+from helper import get_details, convert_size,filenam,progress_text
 
 async def download(id, callback_query):
     data = await get_details(url=f"https://pdisk.pro/{id}")
@@ -26,7 +26,7 @@ async def download(id, callback_query):
                     # Update the progress message every 3 seconds
                     if time.time() - last_update_time > 3:
                         try:
-                            message_text = f"📥Downloading Video...\n\n`{await filenam(data['title'])}`\n\n⏳Progress : `{await convert_size(progress)}/{await convert_size(total_size)} ({progress / total_size * 100:.2f}%)`\n\n💨Speed : `{await convert_size(speed)}/s`\n\n⏱️ETA : {time.strftime('%H:%M:%S', time.gmtime(eta))}"
+                            message_text = f"📥Downloading Video...\n\n`{await filenam(data['title'])}`\n\n`{await progress_text(progress,total_size)}`\n\n⏳Progress : `{await convert_size(progress)}/{await convert_size(total_size)} ({progress / total_size * 100:.2f}%)`\n\n💨Speed : `{await convert_size(speed)}/s`\n\n⏱️ETA : {time.strftime('%H:%M:%S', time.gmtime(eta))}"
                             await callback_query.message.edit_text(message_text)
                         except:
                             pass
@@ -52,7 +52,9 @@ async def upload(current,total,title,id,chat_id,start_time,file_id,bot):
                 percentage = (current / total) * 100
                 speed = current/ (time.time()-start_time)
                 eta = (total - current) / speed if speed > 0 else 0
-                progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
+                progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n"
+                progress_message += f"`{await progress_text(current,total)}\n\n`"
+                progress_message+="⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
                 progress_message += f"💨Speed: `{await convert_size(speed)}/s`\n\n"
                 progress_message += f"ETA: ` {time.strftime('%H:%M:%S', time.gmtime(eta))}\n`"
                 await bot.edit_message_text(
