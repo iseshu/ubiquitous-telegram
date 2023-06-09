@@ -44,5 +44,5 @@ async def progress_text(current, total):
     completed_length = int(progress * progress_bar_length)
     remaining_length = progress_bar_length - completed_length
 
-    progress_bar_text = "[" + "●" * completed_length + "○" * remaining_length + "]"
+    progress_bar_text = "[ " + "● " * completed_length + "○ " * remaining_length + "]"
     return progress_bar_text
