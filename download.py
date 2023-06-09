@@ -54,7 +54,7 @@ async def upload(current,total,title,id,chat_id,start_time,file_id,bot):
                 eta = (total - current) / speed if speed > 0 else 0
                 progress_message = f"⏫ Uploading to Telegram\n\nTitle:`{await filenam(title)}`\n\n"
                 progress_message += f"`{await progress_text(current,total)}\n\n`"
-                progress_message+="⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
+                progress_message+=f"⏳Progress: `{await convert_size(current)}/{await convert_size(total)}` `({percentage:.2f}%)`\n\n"
                 progress_message += f"💨Speed: `{await convert_size(speed)}/s`\n\n"
                 progress_message += f"ETA: ` {time.strftime('%H:%M:%S', time.gmtime(eta))}\n`"
                 await bot.edit_message_text(
