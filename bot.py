@@ -95,7 +95,7 @@ async def callback(client, query_callback):
                 file['file_name'] = file_name
                 file['file_size_bytes'] = osize
                 mycol.update_one({'_id': id}, {'$set': file})
-
+        else:
             if os.path.exists(f"{id}.mp4"):
                 current_time_utc = datetime.utcnow()
                 ist_offset = timedelta(hours=5, minutes=30)
